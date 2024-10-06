@@ -4,23 +4,73 @@ author: "D'Angelo Francis; Su Yeon Seo"
 format: html
 ---
 
-## Quarto
+```{r setup}
+# make sure to load all packages here up top. If you need to install a package, include the commented code here as well :)
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+library(fontawesome) # install.packages("fontawesome") - for waffle graphs
+library(styler) # install.packages("styler") - check for Tidy style guide adherence
+library(lintr) # install.packages("lintr") - check for Tidy style guide adherence
 ```
 
-You can add options to executable code like this 
+## Quick Reference Links:
 
-```{r}
-#| echo: false
-2 * 2
+I believe that we will need these links 
+
+- [Figures](https://quarto.org/docs/authoring/figures.html)
+- [Cross Reference](https://quarto.org/docs/authoring/cross-references.html)
+- [Tidyverse Style Guide Packages](https://style.tidyverse.org/)
+- [Urban Style Visualization Style Guide](https://urbaninstitute.github.io/r-at-urban/graphics-guide.html)
+
+
+## Graph 1 - 
+
+Data Source: [Data.gov website](https://catalog.data.gov/dataset/) - remember to add actual data to repo
+
+Highly interested in looking at this dataset more...
+
+```{r graph 1}
+
+
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+**MAKE SURE TO COMMIT AFTER FINSIHING**
+
+\pagebreak
+
+## Graph 2 - 
+
+Data Source: []() - remember to add to repo
+
+```{r graph 2}
+
+
+```
+
+**MAKE SURE TO COMMIT AFTER FINSIHING**
+
+\pagebreak
+
+## Graph 3 -
+
+Data Source: []() - remember to add to repo
+
+```{r}
+
+
+```
+
+**MAKE SURE TO COMMIT AFTER FINSIHING**
+
+## Graph 4 - 
+
+Data Source: []() - remember to add to repo 
+
+```{r}
+
+
+```
+
+**MAKE SURE TO COMMIT AFTER FINSIHING**
+
+\pagebreak 
