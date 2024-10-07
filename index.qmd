@@ -3,6 +3,7 @@ title: "index"
 author: "D'Angelo Francis; Su Yeon Seo"
 format: html
 ---
+[Assignment 4](https://georgetown.instructure.com/courses/198228/assignments/1109024)
 
 ## Quarto
 
