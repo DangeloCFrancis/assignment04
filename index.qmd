@@ -49,30 +49,30 @@ Research Question: What is the relationship between household income and fertili
 # bringing in data source , clean data up
 
 rok_gdp_by_province <- 
-  read_excel("ROK_gdp_by_province.xlsx") |>
+  read_excel("data/ROK_gdp_by_province.xlsx") |>
   clean_names() |>
-  rename(province = region)
+  rename(shapeName = region)
 
 rok_fertility_province <- 
-  read_csv("Agespecific_Fertility_Rate_Province__20241008012056.csv") |> 
+  read_csv("data/Agespecific_Fertility_Rate_Province__20241008012056.csv") |>
   clean_names() |>
   pivot_longer(
     cols = starts_with("x", ignore.case = TRUE),
     names_to = "year",
     values_to = "fertility_rate"
     ) |>
-  rename(province = by_province_1 , age = by_age_1) |>
+  rename(shapeName = by_province_1 , age = by_age_1) |>
   select(-by_variant_1) |>
-  filter(province != "Whole country", age == "TFR", year == "x2022") |>
-  mutate(province = case_when(
-    province == "Chungcheongbuk-do" ~ "North Chungcheong Province",
-    province == "Chungcheongnam-do" ~ "South Chungcheong Province",
-    province == "Jeollabuk-do" ~ "North Jeolla Province",
-    province == "Jeollanam-do" ~ "South Jeolla Province",
-    province == "Gyeongsangbuk-do" ~ "North Gyeongsang Province",
-    province == "Gyeongsangnam-do" ~ "South Gyeongsang Province",
-    province == "Jeju-do" ~ "Jeju Province",
-    .default = province
+  filter(shapeName != "Whole country", age == "TFR", year == "x2022") |>
+  mutate(shapeName = case_when(
+    shapeName == "Chungcheongbuk-do" ~ "North Chungcheong Province",
+    shapeName == "Chungcheongnam-do" ~ "South Chungcheong Province",
+    shapeName == "Jeollabuk-do" ~ "North Jeolla Province",
+    shapeName == "Jeollanam-do" ~ "South Jeolla Province",
+    shapeName == "Gyeongsangbuk-do" ~ "North Gyeongsang Province",
+    shapeName == "Gyeongsangnam-do" ~ "South Gyeongsang Province",
+    shapeName == "Jeju-do" ~ "Jeju Province",
+    .default = shapeName
     )
   )
 
