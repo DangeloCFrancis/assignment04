@@ -4,12 +4,30 @@ author: "D'Angelo Francis; Su Yeon Seo"
 format: html
 ---
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
+
 # make sure to load all packages here up top. If you need to install a package, include the commented code here as well :)
 
 library(fontawesome) # install.packages("fontawesome") - for waffle graphs
 library(styler) # install.packages("styler") - check for Tidy style guide adherence
 library(lintr) # install.packages("lintr") - check for Tidy style guide adherence
+library(tidyverse)
+library(readxl)
+library(haven)
+library(tidyverse)
+library(patchwork) # easy combine plots
+library(tigris) # direct download of shape files from US Cenus 
+library(sf) # manipulate shapefiles 
+library(tidycensus) # shapefiles from Census 
+library(rgeoboundaries) # international boundaries 
+library(ggrepel)  # install.packages("ggrepel")
+library(janitor)  # install.packages("janitor")
+library(ggthemes) # install.packages("ggthemes")
+
+
+options(scipen=999) # no scientific notation for my plots
+
+
 ```
 
 ## Quick Reference Links:
@@ -21,16 +39,60 @@ I believe that we will need these links
 - [Tidyverse Style Guide Packages](https://style.tidyverse.org/)
 - [Urban Style Visualization Style Guide](https://urbaninstitute.github.io/r-at-urban/graphics-guide.html)
 
+Research Question: What is the relationship between household income and fertility among Koreans by province?
 
 ## Graph 1 - 
 
-Data Source: [Data.gov website](https://catalog.data.gov/dataset/) - remember to add actual data to repo
-
-Highly interested in looking at this dataset more...
 
 ```{r graph 1}
 
+# bringing in data source , clean data up
 
+rok_gdp_by_province <- 
+  read_excel("ROK_gdp_by_province.xlsx") |>
+  clean_names() |>
+  rename(province = region)
+
+rok_fertility_province <- 
+  read_csv("Agespecific_Fertility_Rate_Province__20241008012056.csv") |> 
+  clean_names() |>
+  pivot_longer(
+    cols = starts_with("x", ignore.case = TRUE),
+    names_to = "year",
+    values_to = "fertility_rate"
+    ) |>
+  rename(province = by_province_1 , age = by_age_1) |>
+  select(-by_variant_1) |>
+  filter(province != "Whole country", age == "TFR", year == "x2022") |>
+  mutate(province = case_when(
+    province == "Chungcheongbuk-do" ~ "North Chungcheong Province",
+    province == "Chungcheongnam-do" ~ "South Chungcheong Province",
+    province == "Jeollabuk-do" ~ "North Jeolla Province",
+    province == "Jeollanam-do" ~ "South Jeolla Province",
+    province == "Gyeongsangbuk-do" ~ "North Gyeongsang Province",
+    province == "Gyeongsangnam-do" ~ "South Gyeongsang Province",
+    province == "Jeju-do" ~ "Jeju Province",
+    .default = province
+    )
+  )
+
+rok_fertility_gdp_province <- 
+  full_join(rok_gdp_by_province, rok_fertility_province, by = join_by(province))
+
+# plot code
+
+rok <- geoboundaries(
+  country = "Republic of Korea",
+  adm_lvl = "adm1"
+)
+
+ggplot() + 
+  geom_sf(data = rok) + 
+  theme(
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
 
 ```
 
@@ -43,6 +105,21 @@ Highly interested in looking at this dataset more...
 Data Source: []() - remember to add to repo
 
 ```{r graph 2}
+
+
+gdp_2023 <- 
+  read_excel("gdp_2023.xls") |>
+  clean_names() # from janitor() package 
+
+gdp_2023 <- 
+  gdp_2023 |>
+  pivot_longer(
+    cols = starts_with("x", ignore.case = TRUE),
+    names_to = "year",
+    values_to = "gdp",
+    values_drop_na = TRUE
+    ) |>
+  select(-indicator_code) # not needed 
 
 
 ```
