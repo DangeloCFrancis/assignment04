@@ -112,14 +112,18 @@ rok_fertility_shapefile <-
   full_join(rok, rok_fertility_province, by = join_by(shapeName)) |>
   st_as_sf()
 
-# plot code
+rok_fertility_shapefile_metropolitan <-
+  rok_fertility_shapefile |>
+  filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
 
-# need to add labs.....
+
+# plot code
 
 korea_fertility_plot <-
   ggplot() + 
   geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
-  scale_fill_gradient(
+  geom_sf_text(data = rok_fertility_shapefile_metropolitan, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates",check_overlap = TRUE, size = 2.5, color = "green", position = position_dodge(),) +
+  scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
     low = "#fff",
     high = "#0F64CD"
@@ -128,10 +132,20 @@ korea_fertility_plot <-
     panel.background = element_blank(),
     axis.ticks = element_blank(),
     axis.text = element_blank(),
-    axis.title = element_blank()
+    axis.title = element_blank(),
+    text = element_text(face = "bold")
   ) + 
-  geom_sf_text(stat = "sf_coordinates")
+   labs(title = "South Korea's Fertility Rate",
+       subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
+       caption = "Source: Korean Statistical Information Service")
 
+korea_fertility_plot
+
+ggsave(filename = "korea.pdf")
+
+```
+
+```{r}
 # save for later, need to convert observations into numeric for gradient fill...
 
 korea_gdrp_plot <-
@@ -149,7 +163,7 @@ korea_gdrp_plot <-
   ) + 
   geom_sf_text(stat = "sf_coordinates")
 
-korea_fertility_plot
+korea_gdrp_plot
 ```
 
 **MAKE SURE TO COMMIT AFTER FINSIHING**
