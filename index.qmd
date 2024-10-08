@@ -43,10 +43,23 @@ Research Question: What is the relationship between household income and fertili
 
 ## Graph 1 - 
 
-```{{r hold off on gdp for now}}
+```{r graph 1, message=FALSE, warning=false}
 
- # rok_gdp_by_province <- don't worry about GDP here
-  read_excel("data/ROK_gdp_by_province.xlsx") |>
+# getting geospatial data prepped
+
+rok <- geoboundaries(
+  country = "Republic of Korea",
+  adm_lvl = "adm1")
+
+rok_cities <- 
+  read_sf("data/cities.geojson") |>
+  clean_names() |>
+  filter(ctry == "South Korea")
+
+# bringing in Korean GRDP data source , cleaning data up
+
+rok_gdp_by_province <-
+  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
   clean_names() |>
   mutate(region = case_when(
     region == "Gangwon Province, South Korea" ~ "Gangwon",
@@ -60,12 +73,14 @@ Research Question: What is the relationship between household income and fertili
     region == "South Jeolla Province" ~ "South Jeolla",
     .default = region
   )
-  )
-```
+  ) |> 
+  rename(shapeName = region)
 
-```{r graph 1}
+rok_gdp_shapefile <- 
+  full_join(rok, rok_gdp_by_province, by = join_by(shapeName)) |>
+  st_as_sf()
 
-# bringing in data source , clean data up
+# bringing in fertility data source , cleaning data up
 
 rok_fertility_province <- 
   read_csv("data/Agespecific_Fertility_Rate_Province__20241008012056.csv") |>
@@ -98,20 +113,32 @@ rok_fertility_shapefile <-
 
 # plot code
 
-rok <- geoboundaries(
-  country = "Republic of Korea",
-  adm_lvl = "adm1")
+# need to add labs.....
 
-rok_cities <- 
-  read_sf("data/cities.geojson") |>
-  clean_names() |>
-  filter(ctry == "South Korea")
-
-ggplot() + 
+korea_fertility_plot <-
+  ggplot() + 
   geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
   scale_fill_gradient(
-    name = "Total Fertility Rate",
-    low = "#CD2E3A",
+    name = "Total Fertility Rate \n Number of Children",
+    low = "#fff",
+    high = "#0F64CD"
+  ) + 
+  theme(
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank()
+  ) + 
+  geom_sf_text(stat = "sf_coordinates")
+
+# save for later, need to convert observations into numeric for gradient fill...
+
+korea_gdrp_plot <-
+  ggplot() + 
+  geom_sf(data = rok_gdp_shapefile, aes(fill = gdrp)) +
+  scale_fill_gradient(
+    name = "Total Fertility Rate \n Number of Children",
+    low = "#fff",
     high = "#0F64CD"
   ) + 
   theme(
@@ -121,6 +148,7 @@ ggplot() +
   ) + 
   geom_sf_text(stat = "sf_coordinates")
 
+korea_fertility_plot
 ```
 
 **MAKE SURE TO COMMIT AFTER FINSIHING**
@@ -133,6 +161,7 @@ Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 
+# brining in global gdp data , cleaning up
 
 gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
