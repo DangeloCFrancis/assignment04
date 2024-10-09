@@ -57,30 +57,6 @@ rok_cities <-
   clean_names() |>
   filter(ctry == "South Korea")
 
-# bringing in Korean GRDP data source , cleaning data up
-
-rok_gdp_by_province <-
-  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
-  clean_names() |>
-  mutate(region = case_when(
-    region == "Gangwon Province, South Korea" ~ "Gangwon",
-    region == "Gyeonggi Province" ~ "Gyeonggi",
-    region == "Jeju Province" ~ "Jeju",
-    region == "North Chungcheong Province" ~ "North Chungcheong",
-    region == "North Gyeongsang Province" ~ "North Gyeongsang",
-    region == "North Jeolla Province" ~ "North Jeolla",
-    region == "South Chungcheong Province" ~ "South Chungcheong",
-    region == "South Gyeongsang Province" ~ "South Gyeongsang",
-    region == "South Jeolla Province" ~ "South Jeolla",
-    .default = region
-  )
-  ) |> 
-  rename(shapeName = region)
-
-rok_gdp_shapefile <- 
-  full_join(rok, rok_gdp_by_province, by = join_by(shapeName)) |>
-  st_as_sf()
-
 # bringing in fertility data source , cleaning data up
 
 rok_fertility_province <- 
@@ -122,11 +98,11 @@ rok_fertility_shapefile_metropolitan <-
 korea_fertility_plot <-
   ggplot() + 
   geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
-  geom_sf_text(data = rok_fertility_shapefile_metropolitan, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates",check_overlap = TRUE, size = 2.5, color = "green", position = position_dodge(),) +
+  geom_sf_text(data = rok_fertility_shapefile_metropolitan, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates",check_overlap = TRUE, size = 2.5, color = "black", position = position_dodge(),) +
   scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
     low = "#fff",
-    high = "#0F64CD"
+    high = "pink"
   ) + 
   theme(
     panel.background = element_blank(),
@@ -145,14 +121,57 @@ ggsave(filename = "korea.pdf")
 
 ```
 
-```{r}
-# save for later, need to convert observations into numeric for gradient fill...
+Beginning to make Korea GRDP plot
 
-korea_gdrp_plot <-
+```{r}
+
+
+rok_grdp <-
+  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
+  clean_names() |>
+  mutate(region = case_when(
+    region == "Gangwon Province, South Korea" ~ "Gangwon",
+    region == "Gyeonggi Province" ~ "Gyeonggi",
+    region == "Jeju Province" ~ "Jeju",
+    region == "North Chungcheong Province" ~ "North Chungcheong",
+    region == "North Gyeongsang Province" ~ "North Gyeongsang",
+    region == "North Jeolla Province" ~ "North Jeolla",
+    region == "South Chungcheong Province" ~ "South Chungcheong",
+    region == "South Gyeongsang Province" ~ "South Gyeongsang",
+    region == "South Jeolla Province" ~ "South Jeolla",
+    .default = region
+  )
+  ) |> 
+  rename(shapeName = region)
+
+
+# do gsub to get gdp data to numeric
+
+rok_grdp$gdp_won <- 
+ as.numeric(gsub("KR₩|trillion", "", rok_grdp$gdp_won))
+
+
+rok_grdp$gdp_us <-
+  as.numeric(gsub("US\\$|billion","",rok_grdp$gdp_us))
+
+
+# Korean GRDP data source , cleaning data up
+
+rok_gdp_shapefile <- 
+  full_join(rok, rok_grdp, by = join_by(shapeName)) |>
+  st_as_sf()
+
+  
+
+```
+
+```{r}
+
+korea_grdp_plot <-
   ggplot() + 
-  geom_sf(data = rok_gdp_shapefile, aes(fill = gdrp)) +
+  geom_sf(data = rok_gdp_shapefile, aes(fill = gdp_us)) +
   scale_fill_gradient(
-    name = "Total Fertility Rate \n Number of Children",
+    name = "Gross Domestic Regional Product (2022 $US)",
     low = "#fff",
     high = "#0F64CD"
   ) + 
@@ -160,10 +179,15 @@ korea_gdrp_plot <-
     panel.background = element_blank(),
     axis.ticks = element_blank(),
     axis.text = element_blank()
-  ) + 
-  geom_sf_text(stat = "sf_coordinates")
+  ) 
 
-korea_gdrp_plot
+korea_grdp_plot
+```
+
+```{r stich}
+
+korea_fertility_plot / korea_grdp_plot
+
 ```
 
 **MAKE SURE TO COMMIT AFTER FINSIHING**
@@ -176,7 +200,7 @@ Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 
-# bringing in global gdp data , cleaning up
+# brining in global gdp data , cleaning up
 
 gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
