@@ -139,7 +139,7 @@ ggsave(filename = "korea.pdf")
 # prep gdrp data 
 
 rok_grdp <-
-  read_excel("data/Korean GRDP Wikipedia Excel import_adj.xlsx") |>
+  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
   clean_names() |>
   mutate(region = case_when(
     region == "Gangwon Province, South Korea" ~ "Gangwon",
@@ -154,8 +154,14 @@ rok_grdp <-
     .default = region
   )
   ) |> 
-  rename(shapeName = region) |>
-  rename(grdp_us_billion = gdp_us_billion)
+  rename(shapeName = region)
+
+rok_grdp$gdp_won <- 
+ as.numeric(gsub("KR₩|trillion", "", rok_grdp$gdp_won))
+
+
+rok_grdp$gdp_us <-
+  as.numeric(gsub("US\\$|billion","",rok_grdp$gdp_us))
 
 rok_grdp_shapefile <- 
   full_join(rok, rok_grdp, by = join_by(shapeName)) |>
@@ -163,7 +169,7 @@ rok_grdp_shapefile <-
 
 korea_grdp_plot <-
   ggplot() + 
-  geom_sf(data = rok_grdp_shapefile, aes(fill = grdp_us_billion)) +
+  geom_sf(data = rok_grdp_shapefile, aes(fill = gdp_us)) +
   geom_sf(data = rok_major_cities) + # gives us city points 
   geom_label_repel(data = rok_major_cities, mapping = aes( x = lon, y = lat, label = name)) +
   scale_fill_gradient(
