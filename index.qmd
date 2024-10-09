@@ -56,30 +56,10 @@ rok_cities <-
   read_sf("data/cities.geojson") |>
   clean_names() |>
   filter(ctry == "South Korea")
-
-# bringing in Korean GRDP data source , cleaning data up
-
-rok_gdp_by_province <-
-  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
-  clean_names() |>
-  mutate(region = case_when(
-    region == "Gangwon Province, South Korea" ~ "Gangwon",
-    region == "Gyeonggi Province" ~ "Gyeonggi",
-    region == "Jeju Province" ~ "Jeju",
-    region == "North Chungcheong Province" ~ "North Chungcheong",
-    region == "North Gyeongsang Province" ~ "North Gyeongsang",
-    region == "North Jeolla Province" ~ "North Jeolla",
-    region == "South Chungcheong Province" ~ "South Chungcheong",
-    region == "South Gyeongsang Province" ~ "South Gyeongsang",
-    region == "South Jeolla Province" ~ "South Jeolla",
-    .default = region
-  )
-  ) |> 
-  rename(shapeName = region)
-
-rok_gdp_shapefile <- 
-  full_join(rok, rok_gdp_by_province, by = join_by(shapeName)) |>
-  st_as_sf()
+  
+rok_major_cities <-
+  rok_cities |>
+  filter(name %in% c("Seoul","Busan","Incheon","Ulsan","Daegu","Daejeon","Gwangju"))
 
 # bringing in fertility data source , cleaning data up
 
@@ -112,17 +92,22 @@ rok_fertility_shapefile <-
   full_join(rok, rok_fertility_province, by = join_by(shapeName)) |>
   st_as_sf()
 
-rok_fertility_shapefile_metropolitan <-
-  rok_fertility_shapefile |>
-  filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
+```
 
+
+```{r}
+#| echo: false
+#| warning: false
+#| fig-cap: "South Korea's Fertility Rate by Province"
+#| fig-format: pdf
 
 # plot code
 
 korea_fertility_plot <-
   ggplot() + 
   geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
-  geom_sf_text(data = rok_fertility_shapefile_metropolitan, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates",check_overlap = TRUE, size = 2.5, color = "green", position = position_dodge(),) +
+  geom_sf(data = rok_major_cities) + # gives us city points 
+  geom_label_repel(data = rok_major_cities, mapping = aes( x = lon, y = lat, label = name)) +
   scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
     low = "#fff",
@@ -135,7 +120,7 @@ korea_fertility_plot <-
     axis.title = element_blank(),
     text = element_text(face = "bold")
   ) + 
-   labs(title = "South Korea's Fertility Rate",
+  labs(title = "South Korea's Fertility Rate",
        subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
        caption = "Source: Korean Statistical Information Service")
 
@@ -146,26 +131,74 @@ ggsave(filename = "korea.pdf")
 ```
 
 ```{r}
-# save for later, need to convert observations into numeric for gradient fill...
+#| message: false
+#| echo: false
+#| fig-cap: "South Korea's 2022 Nominal Gross Regional Domestic Product (GDRP)"
+#| fig-format: pdf
 
-korea_gdrp_plot <-
+# prep gdrp data 
+
+rok_grdp <-
+  read_excel("data/Korean GRDP Wikipedia Excel import_adj.xlsx") |>
+  clean_names() |>
+  mutate(region = case_when(
+    region == "Gangwon Province, South Korea" ~ "Gangwon",
+    region == "Gyeonggi Province" ~ "Gyeonggi",
+    region == "Jeju Province" ~ "Jeju",
+    region == "North Chungcheong Province" ~ "North Chungcheong",
+    region == "North Gyeongsang Province" ~ "North Gyeongsang",
+    region == "North Jeolla Province" ~ "North Jeolla",
+    region == "South Chungcheong Province" ~ "South Chungcheong",
+    region == "South Gyeongsang Province" ~ "South Gyeongsang",
+    region == "South Jeolla Province" ~ "South Jeolla",
+    .default = region
+  )
+  ) |> 
+  rename(shapeName = region) |>
+  rename(grdp_us_billion = gdp_us_billion)
+
+rok_grdp_shapefile <- 
+  full_join(rok, rok_grdp, by = join_by(shapeName)) |>
+  st_as_sf()
+
+korea_grdp_plot <-
   ggplot() + 
-  geom_sf(data = rok_gdp_shapefile, aes(fill = gdrp)) +
+  geom_sf(data = rok_grdp_shapefile, aes(fill = grdp_us_billion)) +
+  geom_sf(data = rok_major_cities) + # gives us city points 
+  geom_label_repel(data = rok_major_cities, mapping = aes( x = lon, y = lat, label = name)) +
   scale_fill_gradient(
-    name = "Total Fertility Rate \n Number of Children",
+    name = "Gross Regional Domestic Product, \n 2022 $US Billion",
     low = "#fff",
-    high = "#0F64CD"
+    high = "#CD2E3A"
   ) + 
   theme(
     panel.background = element_blank(),
     axis.ticks = element_blank(),
-    axis.text = element_blank()
+    axis.text = element_blank(),
+    text = element_text(face = "bold"),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
   ) + 
-  geom_sf_text(stat = "sf_coordinates")
+  labs(
+    title = "South Korea Gross Domestic Product (GDP) by Province",
+    subtitle = "A majority of South Korea's GDP comes from its capital and surrounding region",
+    caption = "Source: Korean Statistical Information Service"
+  )
 
-korea_gdrp_plot
+korea_grdp_plot
 ```
 
+
+```{r stich plots together}
+#| echo: false
+#| message: false
+#| fig-format: pdf
+
+korea_fertility_plot / korea_grdp_plot
+
+ggsave(filename = "combined_gdp_fertility_plot.pdf")
+
+```
 **MAKE SURE TO COMMIT AFTER FINSIHING**
 
 \pagebreak
@@ -180,16 +213,13 @@ Data Source: []() - remember to add to repo
 
 gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
-  clean_names() # from janitor() package 
-
-gdp_2023 <- 
-  gdp_2023 |>
+  clean_names() |># from janitor() package 
   pivot_longer(
     cols = starts_with("x", ignore.case = TRUE),
     names_to = "year",
     values_to = "gdp",
     values_drop_na = TRUE
-    ) |>
+  ) |>
   select(-indicator_code) # not needed 
 
 
