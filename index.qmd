@@ -26,7 +26,7 @@ library(janitor)  # install.packages("janitor")
 library(ggthemes) # install.packages("ggthemes")
 
 
-options(scipen=999) # no scientific notation for my plots
+options(scipen=999) # no scientific notation for plots
 
 
 ```
@@ -42,7 +42,9 @@ I believe that we will need these links
 
 Research Question: What is the relationship between household income and fertility among Koreans by province?
 
-## Graph 1 - 
+## Graph 1A - South Korean Fertility Rate by Province
+
+Put purpose and data story here, along with [data source]()
 
 ```{r graph 1, message=FALSE, warning=false}
 
@@ -94,9 +96,7 @@ rok_fertility_shapefile <-
 
 ```
 
-
 ```{r}
-#| echo: false
 #| warning: false
 #| fig-cap: "South Korea's Fertility Rate by Province"
 #| fig-format: pdf
@@ -122,7 +122,7 @@ korea_fertility_plot <-
   ) + 
   labs(title = "South Korea's Fertility Rate",
        subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
-       caption = "Source: Korean Statistical Information Service")
+       caption = "Source: Statistics Korea")
 
 korea_fertility_plot
 
@@ -130,9 +130,13 @@ ggsave(filename = "korea.pdf")
 
 ```
 
+
+## Alternate Graph 1B - South Korean GDP by Province (GRDP)
+
+Put purpose and data story here, along with [data source](kosis.kr)
+
 ```{r}
 #| message: false
-#| echo: false
 #| fig-cap: "South Korea's 2022 Nominal Gross Regional Domestic Product (GDRP)"
 #| fig-format: pdf
 
@@ -194,6 +198,7 @@ korea_grdp_plot <-
 korea_grdp_plot
 ```
 
+## Alternate Graph 1C - stitched graphs 
 
 ```{r stich plots together}
 #| echo: false
@@ -205,13 +210,16 @@ korea_fertility_plot / korea_grdp_plot
 ggsave(filename = "combined_gdp_fertility_plot.pdf")
 
 ```
+
 **MAKE SURE TO COMMIT AFTER FINSIHING**
 
 \pagebreak
 
 ## Graph 2 - 
 
-Data Source: []() - remember to add to repo
+Add purpose and Data Source: []() - remember to add to repo
+
+- Probably want to do plot with aging or women's rights here....
 
 ```{r graph 2}
 
