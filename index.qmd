@@ -176,7 +176,7 @@ Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 
-# brining in global gdp data , cleaning up
+# bringing in global gdp data , cleaning up
 
 gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
