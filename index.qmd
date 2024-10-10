@@ -186,74 +186,75 @@ korea_fertility_plot_2022 / korea_grdp_plot_2022
 
 ```
 
-**MAKE SURE TO COMMIT AFTER FINSIHING**
 
 \pagebreak
 
-## Graph 2 - 
+## Graph 2 - Observing changes in South Korea's GDP and Fertility Rates over time: 1970 - 2023
 
 Data Source: []() - remember to add to repo
 
 ```{r graph 2}
+#| warning: false
+#| message: false
 
 # bringing in fertility data over time
 
 rok_fertility_1970_2023 <-
   read_csv("data/Vital_Statistics_of_Korea_20241.csv",
-           col_types = cols(`1970` = col_character(), 
-                            `1971` = col_character(), 
-                            `1972` = col_character(), 
-                            `1973` = col_character(), 
-                            `1974` = col_character(), 
-                            `1975` = col_character(),
-                            `1976` = col_character(),
-                            `1977` = col_character(),
-                            `1978` = col_character(),
-                            `1979` = col_character(),
-                            `1980` = col_character(),
-                            `1981` = col_character(),
-                            `1982` = col_character(),
-                            `1983` = col_character(),
-                            `1984` = col_character(),
-                            `1985` = col_character(),
-                            `1986` = col_character(),
-                            `1987` = col_character(),
-                            `1988` = col_character(),
-                            `1989` = col_character(),
-                            `1990` = col_character(),
-                            `1991` = col_character(),
-                            `1992` = col_character(),
-                            `1993` = col_character(),
-                            `1994` = col_character(),
-                            `1995` = col_character(),
-                            `1996` = col_character(),
-                            `1997` = col_character(),
-                            `1998` = col_character(),
-                            `1999` = col_character(),
-                            `2000` = col_character(),
-                            `2001` = col_character(),
-                            `2002` = col_character(),
-                            `2003` = col_character(),
-                            `2004` = col_character(),
-                            `2005` = col_character(),
-                            `2006` = col_character(),
-                            `2007` = col_character(),
-                            `2008` = col_character(),
-                            `2009` = col_character(),
-                            `2010` = col_character(),
-                            `2011` = col_character(),
-                            `2012` = col_character(),
-                            `2013` = col_character(),
-                            `2014` = col_character(),
-                            `2015` = col_character(),
-                            `2016` = col_character(),
-                            `2017` = col_character(),
-                            `2018` = col_character(),
-                            `2019` = col_character(),
-                            `2020` = col_character(),
-                            `2021` = col_character(),
-                            `2022` = col_character(),
-                            `2023` = col_character())
+           col_types = cols(`1970` = col_double(), 
+                            `1971` = col_double(), 
+                            `1972` = col_double(), 
+                            `1973` = col_double(), 
+                            `1974` = col_double(), 
+                            `1975` = col_double(),
+                            `1976` = col_double(),
+                            `1977` = col_double(),
+                            `1978` = col_double(),
+                            `1979` = col_double(),
+                            `1980` = col_double(),
+                            `1981` = col_double(),
+                            `1982` = col_double(),
+                            `1983` = col_double(),
+                            `1984` = col_double(),
+                            `1985` = col_double(),
+                            `1986` = col_double(),
+                            `1987` = col_double(),
+                            `1988` = col_double(),
+                            `1989` = col_double(),
+                            `1990` = col_double(),
+                            `1991` = col_double(),
+                            `1992` = col_double(),
+                            `1993` = col_double(),
+                            `1994` = col_double(),
+                            `1995` = col_double(),
+                            `1996` = col_double(),
+                            `1997` = col_double(),
+                            `1998` = col_double(),
+                            `1999` = col_double(),
+                            `2000` = col_double(),
+                            `2001` = col_double(),
+                            `2002` = col_double(),
+                            `2003` = col_double(),
+                            `2004` = col_double(),
+                            `2005` = col_double(),
+                            `2006` = col_double(),
+                            `2007` = col_double(),
+                            `2008` = col_double(),
+                            `2009` = col_double(),
+                            `2010` = col_double(),
+                            `2011` = col_double(),
+                            `2012` = col_double(),
+                            `2013` = col_double(),
+                            `2014` = col_double(),
+                            `2015` = col_double(),
+                            `2016` = col_double(),
+                            `2017` = col_double(),
+                            `2018` = col_double(),
+                            `2019` = col_double(),
+                            `2020` = col_double(),
+                            `2021` = col_double(),
+                            `2022` = col_double(),
+                            `2023` = col_double())
            ) |>
   pivot_longer(
     cols = 2:55,
@@ -264,6 +265,8 @@ rok_fertility_1970_2023 <-
   ) |>
   clean_names() |>
   select(year, total_fertility_rate_persons) 
+
+rok_fertility_1970_2023$year <- as.numeric(rok_fertility_1970_2023$year)
 
 
 
@@ -290,18 +293,28 @@ rok_gdp_1970_2023 <-
   filter(country_code == "KOR") |>
   mutate(gdp = gdp/10e6)
 
+rok_gdp_fertility <-
+  full_join(x = rok_fertility_1970_2023, y = rok_gdp_1970_2023, by = join_by(year))
+
+
 # create south korea's fertility-gdp comparison map
 
-ggplot() +
-  geom_line(data = rok_gdp_1970_2023, aes(x = year, y = gdp)) +
-  geom_point(data = rok_fertility_1970_2023, aes(x = year, y = total_fertility_rate_persons)) +
+ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, label = year)) +
+  geom_point() +
+  geom_text_repel(size = 3) + 
+  geom_smooth(se = FALSE) +
   labs(
-    title = "South Korea's Gross Domestic Product (GDP): 1960 - 2023",
-    subtitle = "South Korea has transitioned from a beneficary country to a donor country over the past 60 years"
-  ) 
+    title = "The Relationship between \nGross Domestic Product (GDP) & Fertility Rate in South Korea: 1970 - 2023",
+    subtitle = str_wrap("Overtime, South Korea's GDP has increased while the Fertility Rate has decreased"),
+    caption = "Source: The World Bank, Korean Statistical Information Service (KOSIS)",
+    x = "GDP (US$ - 2023)",
+    y = "Total Fertility Rate (Persons)") + 
+  theme_minimal() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line() 
+  )
 
-ggplot() +
-geom_point(data = rok_fertility_1970_2023, aes(x = year, y = total_fertility_rate_persons))
 
 ```
 
