@@ -24,6 +24,7 @@ library(rgeoboundaries) # international boundaries
 library(ggrepel)  # install.packages("ggrepel")
 library(janitor)  # install.packages("janitor")
 library(ggthemes) # install.packages("ggthemes")
+library(crsuggest) # install.packages("crsuggest")
 
 
 options(scipen=999) # no scientific notation for my plots
@@ -40,9 +41,11 @@ I believe that we will need these links
 - [Tidyverse Style Guide Packages](https://style.tidyverse.org/)
 - [Urban Style Visualization Style Guide](https://urbaninstitute.github.io/r-at-urban/graphics-guide.html)
 
-Research Question: What is the relationship between household income and fertility among Koreans by province?
+Research Question: What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans by province? 
 
-## Graph 1 - 
+## Graph 1 - South Korean Fertility Rates by Province 
+
+Note - Probably want to attach graph or 
 
 ```{r graph 1, message=FALSE, warning=false}
 
@@ -86,7 +89,7 @@ rok_fertility_province <-
 
 rok_fertility_shapefile <- 
   full_join(rok, rok_fertility_province, by = join_by(shapeName)) |>
-  st_as_sf()
+  st_as_sf(crs =  5178 )
 
 rok_fertility_shapefile_metropolitan <-
   rok_fertility_shapefile |>
@@ -117,7 +120,7 @@ korea_fertility_plot <-
 
 korea_fertility_plot
 
-ggsave(filename = "korea.pdf")
+ggsave(filename = "korea_5178_projection.pdf")
 
 ```
 
@@ -159,7 +162,7 @@ rok_grdp$gdp_us <-
 
 rok_gdp_shapefile <- 
   full_join(rok, rok_grdp, by = join_by(shapeName)) |>
-  st_as_sf()
+  st_as_sf(crs =  5178)
 
   
 
