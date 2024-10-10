@@ -62,7 +62,7 @@ rok_cities <-
 
 # bringing in fertility data source , cleaning data up
 
-rok_fertility_province <- 
+rok_fertility_province_2022 <- 
   read_csv("data/Agespecific_Fertility_Rate_Province__20241008012056.csv") |>
   clean_names() |>
   pivot_longer(
@@ -87,38 +87,33 @@ rok_fertility_province <-
     )
   ) 
 
-rok_fertility_shapefile <- 
-  full_join(rok, rok_fertility_province, by = join_by(shapeName)) |>
+rok_fertility_shapefile_2022 <- 
+  full_join(rok, rok_fertility_province_2022, by = join_by(shapeName)) |>
   st_as_sf(crs =  5178 )
 
-rok_fertility_shapefile_metropolitan <-
-  rok_fertility_shapefile |>
+rok_fertility_shapefile_metropolitan_2022 <-
+  rok_fertility_shapefile_2022 |>
   filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
 
 
 # plot code
 
-korea_fertility_plot <-
+korea_fertility_plot_2022 <-
   ggplot() + 
-  geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
-  geom_sf_text(data = rok_fertility_shapefile_metropolitan, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates",check_overlap = TRUE, size = 2.5, color = "black", position = position_dodge(),) +
+  geom_sf(data = rok_fertility_shapefile_2022, aes(fill = fertility_rate)) +
+  geom_sf_text(data = rok_fertility_shapefile_metropolitan_2022, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates", size = 2.5, color = "black", position = position_dodge()) +
   scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
     low = "#fff",
     high = "pink"
-  ) + 
-  theme(
-    panel.background = element_blank(),
-    axis.ticks = element_blank(),
-    axis.text = element_blank(),
-    axis.title = element_blank(),
-    text = element_text(face = "bold")
-  ) + 
+  ) +
+  theme_void() +
+   theme(text = element_text(face = "bold")) +
    labs(title = "South Korea's Fertility Rate",
        subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
        caption = "Source: Korean Statistical Information Service")
 
-korea_fertility_plot
+korea_fertility_plot_2022
 
 ggsave(filename = "korea_5178_projection.pdf")
 
@@ -129,7 +124,7 @@ Beginning to make Korea GRDP plot
 ```{r}
 
 
-rok_grdp <-
+rok_grdp_2022 <-
   read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
   clean_names() |>
   mutate(region = case_when(
@@ -150,18 +145,18 @@ rok_grdp <-
 
 # do gsub to get gdp data to numeric
 
-rok_grdp$gdp_won <- 
- as.numeric(gsub("KR₩|trillion", "", rok_grdp$gdp_won))
+rok_grdp_2022$gdp_won <- 
+ as.numeric(gsub("KR₩|trillion", "", rok_grdp_2022$gdp_won))
 
 
-rok_grdp$gdp_us <-
-  as.numeric(gsub("US\\$|billion","",rok_grdp$gdp_us))
+rok_grdp_2022$gdp_us <-
+  as.numeric(gsub("US\\$|billion","",rok_grdp_2022$gdp_us))
 
 
 # Korean GRDP data source , cleaning data up
 
-rok_gdp_shapefile <- 
-  full_join(rok, rok_grdp, by = join_by(shapeName)) |>
+rok_gdp_shapefile_2022 <- 
+  full_join(rok, rok_grdp_2022, by = join_by(shapeName)) |>
   st_as_sf(crs =  5178)
 
   
@@ -170,26 +165,24 @@ rok_gdp_shapefile <-
 
 ```{r}
 
-korea_grdp_plot <-
+korea_grdp_plot_2022 <-
   ggplot() + 
-  geom_sf(data = rok_gdp_shapefile, aes(fill = gdp_us)) +
+  geom_sf(data = rok_gdp_shapefile_2022, aes(fill = gdp_us)) +
   scale_fill_gradient(
     name = "Gross Domestic Regional Product (2022 $US)",
     low = "#fff",
-    high = "#0F64CD"
+    high = "#0F64CD",
+    scales::dollar()
   ) + 
-  theme(
-    panel.background = element_blank(),
-    axis.ticks = element_blank(),
-    axis.text = element_blank()
-  ) 
+  theme_void() 
 
-korea_grdp_plot
+korea_grdp_plot_2022
 ```
 
 ```{r stich}
+#| warning: false
 
-korea_fertility_plot / korea_grdp_plot
+korea_fertility_plot_2022 / korea_grdp_plot_2022
 
 ```
 
@@ -203,21 +196,63 @@ Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 
+# bringing in fertility data over time
+
+rok_fertility_province_overtime <- 
+  read_csv("data/Agespecific_Fertility_Rate_Province__20241008012056.csv") |>
+  clean_names() |>
+  pivot_longer(
+    cols = starts_with("x", ignore.case = TRUE),
+    names_to = "year",
+    values_to = "fertility_rate"
+    ) |>
+  rename(shapeName = by_province_1 , age = by_age_1) |>
+  select(-by_variant_1) |>
+  filter(shapeName == "Whole country", age == "TFR") |>
+  mutate(shapeName = case_when(
+    shapeName == "Chungcheongbuk-do" ~ "North Chungcheong",
+    shapeName == "Chungcheongnam-do" ~ "South Chungcheong",
+    shapeName == "Jeollabuk-do" ~ "North Jeolla",
+    shapeName == "Jeollanam-do" ~ "South Jeolla",
+    shapeName == "Gyeongsangbuk-do" ~ "North Gyeongsang",
+    shapeName == "Gyeongsangnam-do" ~ "South Gyeongsang",
+    shapeName == "Jeju-do" ~ "Jeju",
+    shapeName == "Gangwon-do" ~ "Gangwon",
+    shapeName == "Gyeonggi-do" ~ "Gyeonggi",
+    .default = shapeName
+    )
+  ) 
+
 # brining in global gdp data , cleaning up
 
-gdp_2023 <- 
+world_gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
   clean_names() # from janitor() package 
 
-gdp_2023 <- 
-  gdp_2023 |>
+world_gdp_2023 <- 
+  world_gdp_2023 |>
   pivot_longer(
     cols = starts_with("x", ignore.case = TRUE),
     names_to = "year",
     values_to = "gdp",
     values_drop_na = TRUE
     ) |>
-  select(-indicator_code) # not needed 
+  select(-indicator_code)
+
+world_gdp_2023$year <- as.numeric(gsub("x","",world_gdp_2023$year)) # prep for time series viz 
+
+rok_gdp_1960_2023 <- 
+  world_gdp_2023 |>
+  filter(country_code == "KOR") |>
+  mutate(gdp = gdp/10e6)
+
+ggplot() +
+  geom_line(data = rok_gdp_1960_2023, aes(x = year, y = gdp)) + 
+  labs(
+    title = "South Korea's Gross Domestic Product (GDP): 1960 - 2023",
+    subtitle = "South Korea has transitioned from a beneficary country to a donor country over the past 60 years",
+    
+  )
 
 
 ```
