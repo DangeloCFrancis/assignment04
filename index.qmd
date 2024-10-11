@@ -1,9 +1,9 @@
 ---
 title: "index"
-author: "D'Angelo Francis; Su Yeon Seo"
+author: "D'Angelo Francis and Su Yeon Seo, Georgetown University \n McCourt School of Public Policy"
 format: html
+embed-resources: true
 ---
-[Assignment 4](https://georgetown.instructure.com/courses/198228/assignments/1109024)
 
 ```{r setup, message=FALSE, warning=FALSE}
 
@@ -27,25 +27,16 @@ library(ggthemes) # install.packages("ggthemes")
 library(crsuggest) # install.packages("crsuggest")
 
 
-options(scipen=999) # no scientific notation for my plots
+options(scipen=999) # no scientific notation for plots
 
 
 ```
 
-## Quick Reference Links:
-
-I believe that we will need these links 
-
-- [Figures](https://quarto.org/docs/authoring/figures.html)
-- [Cross Reference](https://quarto.org/docs/authoring/cross-references.html)
-- [Tidyverse Style Guide Packages](https://style.tidyverse.org/)
-- [Urban Style Visualization Style Guide](https://urbaninstitute.github.io/r-at-urban/graphics-guide.html)
+## The story beind the visualizations
 
 Research Question: What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans by province? 
 
 ## Graph 1 - South Korean Fertility Rates by Province 
-
-Note - Probably want to attach graph or 
 
 ```{r graph 1, message=FALSE, warning=false}
 
@@ -59,6 +50,10 @@ rok_cities <-
   read_sf("data/cities.geojson") |>
   clean_names() |>
   filter(ctry == "South Korea")
+  
+rok_major_cities <-
+  rok_cities |>
+  filter(name %in% c("Seoul","Busan","Incheon","Ulsan","Daegu","Daejeon","Gwangju"))
 
 # bringing in fertility data source , cleaning data up
 
@@ -95,13 +90,19 @@ rok_fertility_shapefile_metropolitan_2022 <-
   rok_fertility_shapefile_2022 |>
   filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
 
+```
+
+```{r}
+#| warning: false
+#| fig-cap: "South Korea's Fertility Rate by Province"
+#| fig-format: pdf
 
 # plot code
 
 korea_fertility_plot_2022 <-
   ggplot() + 
   geom_sf(data = rok_fertility_shapefile_2022, aes(fill = fertility_rate)) +
-  geom_sf_text(data = rok_fertility_shapefile_metropolitan_2022, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates", size = 2.5, color = "black", position = position_dodge()) +
+  geom_label_repel(data = rok_major_cities, mapping = aes(x = lon, y = lat,label = name), label.size = 0.01, size = 2.5, color = "black", arrow = arrow()) +
   scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
     low = "#fff",
@@ -111,15 +112,13 @@ korea_fertility_plot_2022 <-
    theme(text = element_text(face = "bold")) +
    labs(title = "South Korea's Fertility Rate",
        subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
-       caption = "Source: Korean Statistical Information Service")
+       caption = "Source: Statistics Korea")
 
 korea_fertility_plot_2022
 
 ggsave(filename = "korea_5178_projection.pdf")
 
 ```
-
-Beginning to make Korea GRDP plot
 
 ```{r}
 #| warning: false
@@ -166,12 +165,15 @@ rok_gdp_shapefile_2022 <-
 ```
 
 ```{r}
-#| warning: false
 #| message: false
+#| fig-cap: "South Korea's 2022 Nominal Gross Regional Domestic Product (GDRP)"
+#| fig-format: pdf
+#| warning: false
 
 korea_grdp_plot_2022 <-
   ggplot() + 
   geom_sf(data = rok_gdp_shapefile_2022, aes(fill = gdp_us)) +
+  geom_label_repel(data = rok_major_cities, mapping = aes(x = lon, y = lat,label = name), label.size = 0.01, size = 2.5, color = "black", arrow = arrow()) + 
   scale_fill_gradient(
     name = "Gross Domestic Regional Product (2022 $US)",
     low = "#fff",
@@ -200,7 +202,7 @@ korea_fertility_plot_2022 / korea_grdp_plot_2022
 
 ## Graph 2 - Observing changes in South Korea's GDP and Fertility Rates over time: 1970 - 2023
 
-Data Source: []() - remember to add to repo
+Add purpose and Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 #| warning: false
@@ -278,7 +280,6 @@ rok_fertility_1970_2023 <-
 rok_fertility_1970_2023$year <- as.numeric(rok_fertility_1970_2023$year)
 
 
-
 # bringing in global gdp data , cleaning up
 
 world_gdp_2023 <- 
@@ -292,8 +293,8 @@ world_gdp_2023 <-
     names_to = "year",
     values_to = "gdp",
     values_drop_na = TRUE
-    ) |>
-  select(-indicator_code)
+  ) |>
+  select(-indicator_code) # not needed 
 
 world_gdp_2023$year <- as.numeric(gsub("x","",world_gdp_2023$year)) # prep for time series viz 
 
@@ -324,17 +325,14 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
     axis.line = element_line() 
   ) +
   theme(text = element_text(face = "bold"))
+  
 
 
 ```
 
-**MAKE SURE TO COMMIT AFTER FINSIHING**
-
 \pagebreak
 
 ## Graph 3 - South Korea's Fertility Rate and Female Employment Rate
-
-
 
 Data Source: []() - remember to add to repo
 
@@ -386,8 +384,6 @@ ggplot(data = rok_fertility_female_employment_rate, aes(x = `female employement 
     axis.line = element_line() 
   ) +
   theme(text = element_text(face = "bold"))
-    
-
 
 
 ```
@@ -398,11 +394,79 @@ ggplot(data = rok_fertility_female_employment_rate, aes(x = `female employement 
 
 Data Source: []() - remember to add to repo 
 
-```{r}
+```{r bring in and clean data}
 
+rok_2024_obligation_sentiment <- 
+  read_excel("data/rok_2024_obligation_sentiment.xlsx") |>
+  pivot_longer(
+    cols = 1:5,
+    names_to = "question",
+    values_to = "percent_agree"
+  ) |> 
+  filter(question != "total")
+
+ggplot(data = rok_2024_obligation_sentiment) + 
+  geom_col(aes(x = factor(question, 
+                          levels = c("decide_for_themselves","women_have_obligation","it_depends","refused"),
+                          labels = c(str_wrap("Should Women decide for themselves?"),
+                                     str_wrap("Do Women have an obligation?"),
+                                     str_wrap("Does it depends on the situation?"), 
+                                     str_wrap("Don't Know or Refused to Answer"))),
+               y = percent_agree), 
+           fill = "#0F64CD") + 
+  theme_minimal() + 
+  theme(
+    axis.text.x = element_text(size = 6.5),
+    text = element_text(face = "bold")
+    )+ 
+      labs(
+        title = "South Koreans are alright with declining birthrates...?",
+        subtitle = "Despite declining birthrates, South Koreans are not pressuring women into having more children",
+        caption = "Source: Pew Research Center Survey 2023: Religion in East Asia Survey Topline Questionanaire",
+        x = "Question",
+        y = "Percent (%) who agree (N = 2,104)"
+      ) 
+  
 
 ```
 
-**MAKE SURE TO COMMIT AFTER FINSIHING**
+```{r save for future use}
+#| warning: false
+#| message: false
+
+rok_gii <- read_excel("data/rok_hdr_data.xlsx") |>
+  pivot_wider(
+    names_from = indicator,
+    values_from = value
+  ) |>
+  remove_empty() |>
+  clean_names()
+
+rok_gii$year <- as.numeric(rok_gii$year)
+
+rok_gii_fertility <- 
+  filter(.data = rok_fertility_1970_2023, year %in% (1990:2022)) |>
+  full_join(rok_gii, rok_fertility_1970_2023, by = join_by(year))
+
+ggplot(data = rok_gii_fertility, aes(x = gender_inequality_index_value, y = total_fertility_rate_persons, label = year)) +
+  geom_text_repel(max.overlaps = 20) +
+  geom_point() + 
+  geom_smooth(se = FALSE, color = "#0F64CD") +
+  geom_vline(xintercept = .462) +
+  annotate("text", x = .455, y = 1.25, label = "World (2022)", angle = 90)+
+  scale_x_continuous(n.breaks = 15)+
+  labs(
+    x = "Gender Inequality Index \n(Lower is worse)",
+    y = "Total Fertility Rate \n(persons)",
+    title = "The Relationship between Gender Equality and Fertility Rates \nin South Korea: 1990 - 2022",
+    subtitle = "South Korea's rapidly declining birthrates could be the effect of\n widening gender inequality",
+    caption = "Source: KOSIS, United Nations Human Development Report - Gender Inequality Index"
+  ) + 
+  theme_minimal()+
+  theme(
+    text = element_text(face = "bold")
+  )
+
+```
 
 \pagebreak 
