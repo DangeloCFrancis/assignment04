@@ -1,8 +1,10 @@
 ---
 title: "index"
-author: "D'Angelo Francis and Su Yeon Seo, Georgetown University \n McCourt School of Public Policy"
+author: "D'Angelo Francis and Su Yeon Seo, \n Georgetown University McCourt School of Public Policy"
 format: html
 embed-resources: true
+code-fold: true
+code-line-numbers: true
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
@@ -36,9 +38,12 @@ options(scipen=999) # no scientific notation for plots
 
 Research Question: What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans by province? 
 
-## Graph 1 - South Korean Fertility Rates by Province 
+## Graph 1A and 1B - South Korean Fertility Rates and GDP by Province 
 
-```{r graph 1, message=FALSE, warning=false}
+```{r graph 1}
+#| message: false
+#| warning: false
+#| fig-cap: "South Korea's Fertility Rate by Province"
 
 # getting geospatial data prepped
 
@@ -90,13 +95,6 @@ rok_fertility_shapefile_metropolitan_2022 <-
   rok_fertility_shapefile_2022 |>
   filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
 
-```
-
-```{r}
-#| warning: false
-#| fig-cap: "South Korea's Fertility Rate by Province"
-#| fig-format: pdf
-
 # plot code
 
 korea_fertility_plot_2022 <-
@@ -116,13 +114,12 @@ korea_fertility_plot_2022 <-
 
 korea_fertility_plot_2022
 
-ggsave(filename = "korea_5178_projection.pdf")
-
 ```
 
 ```{r}
 #| warning: false
 #| message: false
+#| fig-cap: "South Korea's 2022 Nominal Gross Regional Domestic Product (GDRP)"
 
 
 rok_grdp_2022 <-
@@ -160,16 +157,6 @@ rok_gdp_shapefile_2022 <-
   full_join(rok, rok_grdp_2022, by = join_by(shapeName)) |>
   st_as_sf(crs =  5178)
 
-  
-
-```
-
-```{r}
-#| message: false
-#| fig-cap: "South Korea's 2022 Nominal Gross Regional Domestic Product (GDRP)"
-#| fig-format: pdf
-#| warning: false
-
 korea_grdp_plot_2022 <-
   ggplot() + 
   geom_sf(data = rok_gdp_shapefile_2022, aes(fill = gdp_us)) +
@@ -188,15 +175,6 @@ korea_grdp_plot_2022 <-
 
 korea_grdp_plot_2022
 ```
-
-```{r stich}
-#| warning: false
-#| message: false
-
-korea_fertility_plot_2022 / korea_grdp_plot_2022
-
-```
-
 
 \pagebreak
 
@@ -325,7 +303,6 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
     axis.line = element_line() 
   ) +
   theme(text = element_text(face = "bold"))
-  
 
 
 ```
