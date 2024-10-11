@@ -443,7 +443,7 @@ ggplot(data = rok_gii_fertility, aes(x = gender_inequality_index_value, y = tota
   annotate("text", x = .455, y = 1.25, label = "World (2022)", angle = 90)+
   scale_x_continuous(n.breaks = 15)+
   labs(
-    x = "Gender Inequality Index \n(higher is better)",
+    x = "Gender Inequality Index \n(higher is worse)",
     y = "Total Fertility Rate \n(persons)",
     title = "The Relationship between Gender Equality and Fertility Rates \nin South Korea: 1990 - 2022",
     subtitle = "South Korea's rapidly declining birthrates could be the effect of\n widening gender inequality",
