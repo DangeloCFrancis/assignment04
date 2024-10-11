@@ -24,6 +24,7 @@ library(rgeoboundaries) # international boundaries
 library(ggrepel)  # install.packages("ggrepel")
 library(janitor)  # install.packages("janitor")
 library(ggthemes) # install.packages("ggthemes")
+library(crsuggest) # install.packages("crsuggest")
 
 
 options(scipen=999) # no scientific notation for plots
@@ -41,6 +42,7 @@ I believe that we will need these links
 - [Tidyverse Style Guide Packages](https://style.tidyverse.org/)
 - [Urban Style Visualization Style Guide](https://urbaninstitute.github.io/r-at-urban/graphics-guide.html)
 
+<<<<<<< HEAD
 Research Question: What is the relationship between household income and fertility among Koreans by province?
 =======
 In deciding this 
@@ -50,6 +52,13 @@ Question: What is the relationship between GRDP, household income, and women's r
 ## Graph 1A - South Korean Fertility Rate by Province
 
 Put purpose and data story here, along with [data source]()
+=======
+Research Question: What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans by province? 
+
+## Graph 1 - South Korean Fertility Rates by Province 
+
+Note - Probably want to attach graph or 
+>>>>>>> main
 
 ```{r graph 1, message=FALSE, warning=false}
 
@@ -63,14 +72,17 @@ rok_cities <-
   read_sf("data/cities.geojson") |>
   clean_names() |>
   filter(ctry == "South Korea")
+<<<<<<< HEAD
   
 rok_major_cities <-
   rok_cities |>
   filter(name %in% c("Seoul","Busan","Incheon","Ulsan","Daegu","Daejeon","Gwangju"))
+=======
+>>>>>>> main
 
 # bringing in fertility data source , cleaning data up
 
-rok_fertility_province <- 
+rok_fertility_province_2022 <- 
   read_csv("data/Agespecific_Fertility_Rate_Province__20241008012056.csv") |>
   clean_names() |>
   pivot_longer(
@@ -95,11 +107,17 @@ rok_fertility_province <-
     )
   ) 
 
-rok_fertility_shapefile <- 
-  full_join(rok, rok_fertility_province, by = join_by(shapeName)) |>
-  st_as_sf()
+rok_fertility_shapefile_2022 <- 
+  full_join(rok, rok_fertility_province_2022, by = join_by(shapeName)) |>
+  st_as_sf(crs =  5178 )
 
+<<<<<<< HEAD
 ```
+=======
+rok_fertility_shapefile_metropolitan_2022 <-
+  rok_fertility_shapefile_2022 |>
+  filter(shapeName %in% c("Seoul", "Busan", "Daegu", "Incheon", "Gwuangju", "Daejeon", "Ulsan"))
+>>>>>>> main
 
 ```{r}
 #| warning: false
@@ -108,8 +126,9 @@ rok_fertility_shapefile <-
 
 # plot code
 
-korea_fertility_plot <-
+korea_fertility_plot_2022 <-
   ggplot() + 
+<<<<<<< HEAD
   geom_sf(data = rok_fertility_shapefile, aes(fill = fertility_rate)) +
   geom_sf(data = rok_major_cities) + # gives us city points 
   geom_label_repel(data = rok_major_cities, mapping = aes( x = lon, y = lat, label = name)) +
@@ -126,15 +145,72 @@ korea_fertility_plot <-
     text = element_text(face = "bold")
   ) + 
   labs(title = "South Korea's Fertility Rate",
+=======
+  geom_sf(data = rok_fertility_shapefile_2022, aes(fill = fertility_rate)) +
+  geom_sf_text(data = rok_fertility_shapefile_metropolitan_2022, mapping = aes(label = shapeName), label.size = 0.01, stat = "sf_coordinates", size = 2.5, color = "black", position = position_dodge()) +
+  scale_fill_continuous(
+    name = "Total Fertility Rate \n Number of Children",
+    low = "#fff",
+    high = "pink"
+  ) +
+  theme_void() +
+   theme(text = element_text(face = "bold")) +
+   labs(title = "South Korea's Fertility Rate",
+>>>>>>> main
        subtitle = "South Korea is below replacement rate(2.1 children) nationwide, \n especially in metropolitan areas",
        caption = "Source: Statistics Korea")
 
-korea_fertility_plot
+korea_fertility_plot_2022
 
-ggsave(filename = "korea.pdf")
+ggsave(filename = "korea_5178_projection.pdf")
 
 ```
 
+Beginning to make Korea GRDP plot
+
+```{r}
+
+
+rok_grdp_2022 <-
+  read_excel("data/Korean GRDP Wikipedia Excel import.xlsx") |>
+  clean_names() |>
+  mutate(region = case_when(
+    region == "Gangwon Province, South Korea" ~ "Gangwon",
+    region == "Gyeonggi Province" ~ "Gyeonggi",
+    region == "Jeju Province" ~ "Jeju",
+    region == "North Chungcheong Province" ~ "North Chungcheong",
+    region == "North Gyeongsang Province" ~ "North Gyeongsang",
+    region == "North Jeolla Province" ~ "North Jeolla",
+    region == "South Chungcheong Province" ~ "South Chungcheong",
+    region == "South Gyeongsang Province" ~ "South Gyeongsang",
+    region == "South Jeolla Province" ~ "South Jeolla",
+    .default = region
+  )
+  ) |> 
+  rename(shapeName = region)
+
+
+# do gsub to get gdp data to numeric
+
+rok_grdp_2022$gdp_won <- 
+ as.numeric(gsub("KR₩|trillion", "", rok_grdp_2022$gdp_won))
+
+
+rok_grdp_2022$gdp_us <-
+  as.numeric(gsub("US\\$|billion","",rok_grdp_2022$gdp_us))
+
+
+# Korean GRDP data source , cleaning data up
+
+rok_gdp_shapefile_2022 <- 
+  full_join(rok, rok_grdp_2022, by = join_by(shapeName)) |>
+  st_as_sf(crs =  5178)
+
+  
+
+```
+
+<<<<<<< HEAD
 
 ## Alternate Graph 1B - South Korean GDP by Province (GRDP)
 
@@ -215,33 +291,172 @@ korea_grdp_plot
 korea_fertility_plot / korea_grdp_plot
 
 ggsave(filename = "combined_gdp_fertility_plot.pdf")
+=======
+```{r}
+
+korea_grdp_plot_2022 <-
+  ggplot() + 
+  geom_sf(data = rok_gdp_shapefile_2022, aes(fill = gdp_us)) +
+  scale_fill_gradient(
+    name = "Gross Domestic Regional Product (2022 $US)",
+    low = "#fff",
+    high = "#0F64CD",
+    scales::dollar_format()
+  ) + 
+  theme_void() 
+
+korea_grdp_plot_2022
+```
+
+```{r stich}
+#| warning: false
+
+korea_fertility_plot_2022 / korea_grdp_plot_2022
+>>>>>>> main
 
 ```
 
-**MAKE SURE TO COMMIT AFTER FINSIHING**
 
 \pagebreak
 
-## Graph 2 - 
+## Graph 2 - Observing changes in South Korea's GDP and Fertility Rates over time: 1970 - 2023
 
 Add purpose and Data Source: []() - remember to add to repo
 
 - Probably want to do plot with aging or women's rights here....
 
 ```{r graph 2}
+#| warning: false
+#| message: false
 
-# brining in global gdp data , cleaning up
+# bringing in fertility data over time
 
+<<<<<<< HEAD
 world_gdp_2023 <- 
   read_excel("gdp_2023.xls") |>
   clean_names() |># from janitor() package 
+=======
+rok_fertility_1970_2023 <-
+  read_csv("data/Vital_Statistics_of_Korea_20241.csv",
+           col_types = cols(`1970` = col_double(), 
+                            `1971` = col_double(), 
+                            `1972` = col_double(), 
+                            `1973` = col_double(), 
+                            `1974` = col_double(), 
+                            `1975` = col_double(),
+                            `1976` = col_double(),
+                            `1977` = col_double(),
+                            `1978` = col_double(),
+                            `1979` = col_double(),
+                            `1980` = col_double(),
+                            `1981` = col_double(),
+                            `1982` = col_double(),
+                            `1983` = col_double(),
+                            `1984` = col_double(),
+                            `1985` = col_double(),
+                            `1986` = col_double(),
+                            `1987` = col_double(),
+                            `1988` = col_double(),
+                            `1989` = col_double(),
+                            `1990` = col_double(),
+                            `1991` = col_double(),
+                            `1992` = col_double(),
+                            `1993` = col_double(),
+                            `1994` = col_double(),
+                            `1995` = col_double(),
+                            `1996` = col_double(),
+                            `1997` = col_double(),
+                            `1998` = col_double(),
+                            `1999` = col_double(),
+                            `2000` = col_double(),
+                            `2001` = col_double(),
+                            `2002` = col_double(),
+                            `2003` = col_double(),
+                            `2004` = col_double(),
+                            `2005` = col_double(),
+                            `2006` = col_double(),
+                            `2007` = col_double(),
+                            `2008` = col_double(),
+                            `2009` = col_double(),
+                            `2010` = col_double(),
+                            `2011` = col_double(),
+                            `2012` = col_double(),
+                            `2013` = col_double(),
+                            `2014` = col_double(),
+                            `2015` = col_double(),
+                            `2016` = col_double(),
+                            `2017` = col_double(),
+                            `2018` = col_double(),
+                            `2019` = col_double(),
+                            `2020` = col_double(),
+                            `2021` = col_double(),
+                            `2022` = col_double(),
+                            `2023` = col_double())
+           ) |>
+  pivot_longer(
+    cols = 2:55,
+    names_to = "year") |>
+  pivot_wider(
+    names_from = "By items",
+    values_from = value
+  ) |>
+  clean_names() |>
+  select(year, total_fertility_rate_persons) 
+
+rok_fertility_1970_2023$year <- as.numeric(rok_fertility_1970_2023$year)
+
+
+
+# bringing in global gdp data , cleaning up
+
+world_gdp_2023 <- 
+  read_excel("data/gdp_2023.xls") |>
+  clean_names() # from janitor() package 
+
+world_gdp_2023 <- 
+  world_gdp_2023 |>
+>>>>>>> main
   pivot_longer(
     cols = starts_with("x", ignore.case = TRUE),
     names_to = "year",
     values_to = "gdp",
     values_drop_na = TRUE
+<<<<<<< HEAD
   ) |>
   select(-indicator_code) # not needed 
+=======
+    ) |>
+  select(-indicator_code)
+
+world_gdp_2023$year <- as.numeric(gsub("x","",world_gdp_2023$year)) # prep for time series viz 
+
+rok_gdp_1970_2023 <- 
+  world_gdp_2023 |>
+  filter(country_code == "KOR") |>
+  mutate(gdp = gdp/10e6)
+
+rok_gdp_fertility <-
+  full_join(x = rok_fertility_1970_2023, y = rok_gdp_1970_2023, by = join_by(year))
+
+
+# create south korea's fertility-gdp comparison map
+
+ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, label = year)) +
+  geom_point() +
+  geom_text_repel(size = 3) + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "The Relationship between \nGross Domestic Product (GDP) & Fertility Rate in South Korea: 1970 - 2023",
+    subtitle = str_wrap("Overtime, South Korea's GDP has increased while the Fertility Rate has decreased"),
+    caption = "Source: The World Bank, Korean Statistical Information Service (KOSIS)",
+    x = "GDP (US$ - 2023)",
+    y = "Total Fertility Rate (Persons)") + 
+  theme_minimal() + 
+  theme(
+    panel.grid = element_blank(),
+    axis.line = element_line() 
+  )
+>>>>>>> main
 
 world_gdp_2023$year <- as.numeric(gsub("x","",world_gdp_2023$year)) # prep for time series viz 
 
