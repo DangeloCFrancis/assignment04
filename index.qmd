@@ -297,7 +297,7 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
   geom_smooth(se = FALSE) +
   labs(
     title = "The Relationship between \nGross Domestic Product (GDP) & Fertility Rate in South Korea: 1970 - 2023",
-    subtitle = str_wrap("Overtime, South Korea's GDP has increased while the Fertility Rate has decreased"),
+    subtitle = str_wrap("Over the past 50 years, South Korea's GDP has increased while the Fertility Rate has decreased"),
     caption = "Source: The World Bank, Korean Statistical Information Service (KOSIS)",
     x = "GDP (US$ - 2023)",
     y = "Total Fertility Rate (Persons)") + 
@@ -410,7 +410,12 @@ ggplot(data = rok_2024_obligation_sentiment) +
 
 ```
 
-Despite the alarming decrease in birthrates, visualization 4A seems to suggest that South Koreans are resigned to lower fertility. This possibly suggests that Korean society has gradually accepted Korean women as equal to men. However, graph 4B suggests otherwise. It appears that South Korea has gone *backwards* in achieving gender equality--far from the world benchmark. 
+Despite the alarming decrease in birthrates, visualization 4A seems to suggest that South Koreans are resigned to lower fertility. Graph 4B suggests that gender *equality* is a aggravating factor in declining birth rates. This makes sense, as the United Nations methodology for measuring gender inequality uses reproductive health, gender empowerment, and labor force participation to create a composite measure.[^1] From a political lens, this relationship that we observe between the GII and fertility rates serves as 'unsavory' ammunition for conservative, far-right South Korean politicians to curb women's empowerment and gender equality.[^2]
+
+
+[^1]: [United Nations - Human Development Report Gender Inequality Index](https://hdr.undp.org/data-center/thematic-composite-indices/gender-inequality-index#/indicies/GII)
+
+[^2]: [Heather Chen, Junhyop Kwon; *Young, Angry, Misogynistic, and Male: Inside South Korea’s Incel Election*, Vice News 2022](Young, Angry, Misogynistic, and Male: Inside South Korea’s Incel Election)
 
 ```{r save for future use}
 #| warning: false
@@ -438,7 +443,7 @@ ggplot(data = rok_gii_fertility, aes(x = gender_inequality_index_value, y = tota
   annotate("text", x = .455, y = 1.25, label = "World (2022)", angle = 90)+
   scale_x_continuous(n.breaks = 15)+
   labs(
-    x = "Gender Inequality Index \n(Lower is worse)",
+    x = "Gender Inequality Index \n(higher is better)",
     y = "Total Fertility Rate \n(persons)",
     title = "The Relationship between Gender Equality and Fertility Rates \nin South Korea: 1990 - 2022",
     subtitle = "South Korea's rapidly declining birthrates could be the effect of\n widening gender inequality",
