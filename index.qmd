@@ -1,6 +1,6 @@
 ---
-title: "index"
-author: "D'Angelo Francis and Su Yeon Seo, \n Georgetown University McCourt School of Public Policy"
+title: "South Korea's Demographic Crisis: \n The Possible Cause(s) in Declining Birthrate"
+author: "D'Angelo Francis and Su Yeon Seo,\nGeorgetown University McCourt School of Public Policy"
 format: html
 embed-resources: true
 code-fold: true
@@ -34,9 +34,9 @@ options(scipen=999) # no scientific notation for plots
 
 ```
 
-## The story beind the visualizations
+## Our Research Question
 
-Research Question: What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans by province? 
+*What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans?*
 
 ## Graph 1A and 1B - South Korean Fertility Rates and GDP by Province 
 
@@ -116,6 +116,8 @@ korea_fertility_plot_2022
 
 ```
 
+To find the variables potentially related to South Korea's fertility rate, we first analyzed the data from the [Korean Statistical Information Service (KOSIS)](https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1B8000H&conn_path=I2&language=en) to see the relationship between "province" (the area of residence) and "fertility rate". Graph 1A shows that the fertility rate in South Korea is below the replacement rate (2.1 children) nationwide, particularly low in metropolitan areas. The fertility rates are lower in urban areas compared to rural areas, with Seoul having the lowest fertility rate out of all regions.
+
 ```{r}
 #| warning: false
 #| message: false
@@ -176,11 +178,11 @@ korea_grdp_plot_2022 <-
 korea_grdp_plot_2022
 ```
 
+We also analyzed the data from [The World Bank](data.worldbank.org) to see the relationship between "economic productivity (GDP)" and "fertility rate" by region. Graph 1 shows that the urban areas with relatively low fertility rates tend to have a higher gross domestic regional product (GDRP), noticeable around the capital area of Seoul and Gyeonggi province where businesses and infrastructures are concentrated but also with higher level of competition over jobs and regional resources in the higher productivity areas.
+
 \pagebreak
 
 ## Graph 2 - Observing changes in South Korea's GDP and Fertility Rates over time: 1970 - 2023
-
-Add purpose and Data Source: []() - remember to add to repo
 
 ```{r graph 2}
 #| warning: false
@@ -307,11 +309,12 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
 
 ```
 
+
+For intuitive comprehension of the relationship between Gross Domestic Product (GDP) and the Fertility Rate in South Korea, We analyzed the data from [The World Bank](data.worldbank.org) and [KOSIS](https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1B8000F&conn_path=I2&language=en). Graph 2 shows that as the country's GDP grew over time, its fertility rate decreased in reverse relationship.
+
 \pagebreak
 
 ## Graph 3 - South Korea's Fertility Rate and Female Employment Rate
-
-Data Source: []() - remember to add to repo
 
 ```{r}
 #| warning: false
@@ -365,11 +368,9 @@ ggplot(data = rok_fertility_female_employment_rate, aes(x = `female employement 
 
 ```
 
-**MAKE SURE TO COMMIT AFTER FINSIHING**
+To discover another potentially related variable to the decreasing fertility rate of South Korea, we also analyzed the relationship between "Female Employment Rate" and "Fertility Rate". As visually displayed in Graph 3, the country's fertility rate is *negatively* affected by the over time increase in female employment rate.
 
-## Graph 4 - 
-
-Data Source: []() - remember to add to repo 
+## Graph 4A & 4B - 
 
 ```{r bring in and clean data}
 
@@ -406,6 +407,8 @@ ggplot(data = rok_2024_obligation_sentiment) +
   
 
 ```
+
+Despite the alarming decrease in birthrates, visualization 4A seems to suggest that South Koreans are resigned to lower fertility. This possibly suggests that Korean society has gradually accepted Korean women as equal to men. However, graph 4B suggests otherwise. It appears that South Korea has gone *backwards* in achieving gender equality--far from the world benchmark. 
 
 ```{r save for future use}
 #| warning: false
