@@ -36,7 +36,7 @@ options(scipen=999) # no scientific notation for plots
 
 ## Our Research Question
 
-*What is the relationship between GRDP, household income, and women's rights on fertility among South Koreans?*
+*How has Gross Regional Domestic Product (GRDP), female labor force participation, and women's rights affected fertility rates among South Koreans?*
 
 ## Graph 1A and 1B - South Korean Fertility Rates and GDP by Province 
 
@@ -100,6 +100,7 @@ rok_fertility_shapefile_metropolitan_2022 <-
 korea_fertility_plot_2022 <-
   ggplot() + 
   geom_sf(data = rok_fertility_shapefile_2022, aes(fill = fertility_rate)) +
+  geom_sf(data=rok_major_cities)+
   geom_label_repel(data = rok_major_cities, mapping = aes(x = lon, y = lat,label = name), label.size = 0.01, size = 2.5, color = "black", arrow = arrow()) +
   scale_fill_continuous(
     name = "Total Fertility Rate \n Number of Children",
@@ -162,6 +163,7 @@ rok_gdp_shapefile_2022 <-
 korea_grdp_plot_2022 <-
   ggplot() + 
   geom_sf(data = rok_gdp_shapefile_2022, aes(fill = gdp_us)) +
+  geom_sf(data=rok_major_cities)+
   geom_label_repel(data = rok_major_cities, mapping = aes(x = lon, y = lat,label = name), label.size = 0.01, size = 2.5, color = "black", arrow = arrow()) + 
   scale_fill_gradient(
     name = "Gross Domestic Regional Product (2022 $US)",
@@ -178,7 +180,7 @@ korea_grdp_plot_2022 <-
 korea_grdp_plot_2022
 ```
 
-We also analyzed the data from [The World Bank](data.worldbank.org) to see the relationship between "economic productivity (GDP)" and "fertility rate" by region. Graph 1 shows that the urban areas with relatively low fertility rates tend to have a higher gross domestic regional product (GDRP), noticeable around the capital area of Seoul and Gyeonggi province where businesses and infrastructures are concentrated but also with higher level of competition over jobs and regional resources in the higher productivity areas.
+We also analyzed the data from [The World Bank](https://data.worldbank.org/?_gl=1*17v9nok*_gcl_au*MTM3MTQzODQxNi4xNzI1NjUwODcy) to see the relationship between "economic productivity (GDP)" and "fertility rate" by region. Graph 1 shows that the urban areas with relatively low fertility rates tend to have a higher gross domestic regional product (GDRP), noticeable around the capital area of Seoul and Gyeonggi province where businesses and infrastructures are concentrated but also with higher level of competition over jobs and regional resources in the higher productivity areas.
 
 \pagebreak
 
@@ -310,7 +312,7 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
 ```
 
 
-For intuitive comprehension of the relationship between Gross Domestic Product (GDP) and the Fertility Rate in South Korea, We analyzed the data from [The World Bank](data.worldbank.org) and [KOSIS](https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1B8000F&conn_path=I2&language=en). Graph 2 shows that as the country's GDP grew over time, its fertility rate decreased in reverse relationship.
+For intuitive comprehension of the relationship between Gross Domestic Product (GDP) and the Fertility Rate in South Korea, We analyzed the data from [The World Bank](https://data.worldbank.org/?_gl=1*17v9nok*_gcl_au*MTM3MTQzODQxNi4xNzI1NjUwODcy) and [KOSIS](https://kosis.kr/statHtml/statHtml.do?orgId=101&tblId=DT_1B8000F&conn_path=I2&language=en). Graph 2 shows that as the country's GDP grew over time, its fertility rate decreased in reverse relationship.
 
 \pagebreak
 
@@ -370,7 +372,7 @@ ggplot(data = rok_fertility_female_employment_rate, aes(x = `female employement 
 
 To discover another potentially related variable to the decreasing fertility rate of South Korea, we also analyzed the relationship between "Female Employment Rate" and "Fertility Rate". As visually displayed in Graph 3, the country's fertility rate is *negatively* affected by the over time increase in female employment rate.
 
-## Graph 4A & 4B - 
+## Graph 4A & 4B - Gender Equality Matters
 
 ```{r bring in and clean data}
 
@@ -399,7 +401,7 @@ ggplot(data = rok_2024_obligation_sentiment) +
     )+ 
       labs(
         title = "South Koreans are alright with declining birthrates...?",
-        subtitle = "Despite declining birthrates, South Koreans are not pressuring women into having more children",
+        subtitle = "Despite declining birthrates, South Koreans are not \npressuring women into having more children",
         caption = "Source: Pew Research Center Survey 2023: Religion in East Asia Survey Topline Questionanaire",
         x = "Question",
         y = "Percent (%) who agree (N = 2,104)"
