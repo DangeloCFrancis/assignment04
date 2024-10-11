@@ -178,7 +178,11 @@ korea_grdp_plot_2022 <-
     high = "#0F64CD",
     scales::dollar_format()
   ) + 
-  theme_void() 
+  theme_void() +
+  theme(text = element_text(face = "bold")) +
+  labs(title = "South Korea's Gross Domestic Product (GDP) by Region",
+       subtitle = "South Korea's Gross Domestic Product (GDP) gets higher as it gets closer to the capital \n(Seoul and Gyeonggi) region",
+       caption = "Source: The World Bank")
 
 korea_grdp_plot_2022
 ```
@@ -318,7 +322,8 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
   theme(
     panel.grid = element_blank(),
     axis.line = element_line() 
-  )
+  ) +
+  theme(text = element_text(face = "bold"))
 
 
 ```
@@ -328,6 +333,8 @@ ggplot(data = rok_gdp_fertility, aes(x = gdp, y = total_fertility_rate_persons, 
 \pagebreak
 
 ## Graph 3 - South Korea's Fertility Rate and Female Employment Rate
+
+
 
 Data Source: []() - remember to add to repo
 
@@ -377,7 +384,8 @@ ggplot(data = rok_fertility_female_employment_rate, aes(x = `female employement 
   theme(
     panel.grid = element_blank(),
     axis.line = element_line() 
-  )
+  ) +
+  theme(text = element_text(face = "bold"))
     
 
 
